@@ -3,7 +3,6 @@ package org.userfriendly.autoscavenge.script;
 import java.awt.Color;
 
 import org.apache.log4j.Logger;
-import org.userfriendly.autoscavenge.AutoScavengeModPlugin;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignUIAPI;
