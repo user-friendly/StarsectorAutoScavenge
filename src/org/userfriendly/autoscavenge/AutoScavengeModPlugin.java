@@ -11,8 +11,8 @@ public class AutoScavengeModPlugin extends BaseModPlugin {
 	@Override
 	public void onGameLoad(boolean newGame) {
 		String msg = new String("Automatic salvage pickup enabled.");
-		log.debug(msg);
 		
+		log.debug(msg);
 		Utility.postConsoleMessage("Automatic salvage pickup enabled.");
 	}
 }

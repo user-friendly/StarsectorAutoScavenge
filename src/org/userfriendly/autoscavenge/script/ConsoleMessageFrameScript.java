@@ -9,7 +9,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignUIAPI;
 
 public class ConsoleMessageFrameScript implements com.fs.starfarer.api.EveryFrameScript {
-	private static final Logger log = Global.getLogger(AutoScavengeModPlugin.class);
+	private static final Logger log = Global.getLogger(ConsoleMessageFrameScript.class);
 	
 	protected boolean isDone = false;
 	protected float wait = 0.5f;
