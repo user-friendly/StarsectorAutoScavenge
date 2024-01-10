@@ -1,0 +1,16 @@
+{
+	"id":			"AutoScavenge",
+	"name":			"Auto Salvage Pickup",
+	"author":		"User Friendly",
+	"description":	"Let's you skip the cargo pickup tab after a salvage operation.",
+	"version":		"1.0.0",
+	"gameVersion":	"0.96a-RC10",
+	"utility":		"true",
+	"modPlugin":	"org.userfriendly.autoscavenge.AutoScavengeModPlugin",
+	"jars":			["jars/StarsectorAutoScavenge.jar"],
+	"replace":		[],
+  	#"dependencies": [{
+  	#	"id":		"lw_lazylib",
+	#	"name":		"LazyLib"
+	#}]
+}
