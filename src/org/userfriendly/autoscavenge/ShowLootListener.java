@@ -15,6 +15,7 @@ import com.fs.starfarer.api.campaign.SpecialItemData;
 import com.fs.starfarer.api.campaign.SpecialItemSpecAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.econ.SubmarketAPI;
+import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Commodities;
 import com.fs.starfarer.api.impl.campaign.terrain.DebrisFieldTerrainPlugin.DebrisFieldParams;
 import com.fs.starfarer.api.impl.campaign.terrain.DebrisFieldTerrainPlugin.DebrisFieldSource;
@@ -149,6 +150,41 @@ public class ShowLootListener implements
 		}
 		
 		log.debug(debugMsg);
+		
+		if (null != target && target.getCustomEntityType().equals("debris_field_shared")) {
+			// TODO Find out if this is the correct memory object to use.
+			//		The SalvageEntity::performSalvage() does the "no dismiss dialog" check,
+			//		but on what memory object? Find out how this memory system works and
+			//		what exactly it is. If this flag is set on a dialog memory, that is
+			//		local to that dialog then the flag check is no good.
+			MemoryAPI memory = target.getMemoryWithoutUpdate();
+			if (null != memory) {
+				if (!memory.contains("$doNotDismissDialogAfterSalvage")) {
+					
+					// FIXME Do the actual cargo filtering and operations here.
+					
+					
+					log.debug("Drop unused loot from salvage ops.");
+					
+					// This next part is 
+					memory.set("$autoSalvagePickupLoot", loot);
+				}
+				else {
+					// If the dialog is not finished, bad thing happens:
+					// Tested closing the cargo UI when opening cargo pods and
+					// the player is stuck on the initial dialog and the
+					// main campaign gets unpaused. Pressing the numbers or escape,
+					// keys does not close the dialog.
+					log.debug("Can not auto-loot salvage - dialog is not finished.");
+				}
+			}
+			else {
+				log.debug("No memory map found");
+			}
+		}
+		else {
+			log.debug("Either no target or target is of invalid type.");
+		}
 	}
 
 	@Override
@@ -160,6 +196,31 @@ public class ShowLootListener implements
 		debugMsg += debugCargo(playerCargo);
 		
 		log.debug(debugMsg);
+		
+		// TODO Refactor code and check for entity type, same as in the loot report method.
+		//		Or better yet, yank the similar code into a helper method.
+		InteractionDialogAPI dialog = Global.getSector().getCampaignUI().getCurrentInteractionDialog();
+		if (null == dialog || null == dialog.getInteractionTarget()) {
+			log.debug("No dialog or no target.");
+		}
+		else {
+			MemoryAPI memory = dialog.getInteractionTarget().getMemory();
+			if (memory.contains("$autoSalvagePickupLoot")
+					&& null != memory.get("$autoSalvagePickupLoot")
+			) {
+				CargoAPI loot = (CargoAPI) memory.get("$autoSalvagePickupLoot");
+				dialog.getVisualPanel().closeCoreUI();
+				Global.getSector().reportPlayerDidNotTakeCargo(loot);
+				
+				memory.unset("$autoSalvagePickupLoot");
+				
+//				Object test = dialog.getInteractionTarget().getMemoryWithoutUpdate().get(MemFlags.SALVAGE_DEBRIS_FIELD);
+//				if (test instanceof DebrisFieldTerrainPlugin) {
+//					DebrisFieldTerrainPlugin debris = (DebrisFieldTerrainPlugin) test;
+//					debris.setScavenged(false);
+//				}
+			}
+		}
 	}
 
 	@Override
