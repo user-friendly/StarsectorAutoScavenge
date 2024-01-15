@@ -1,14 +1,56 @@
 package org.userfriendly.autoscavenge;
 
 import java.awt.Color;
+import java.util.List;
 
 import org.userfriendly.autoscavenge.script.ConsoleMessageFrameScript;
 
 import com.fs.starfarer.api.EveryFrameScript;
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.CampaignFleetAPI;
+import com.fs.starfarer.api.campaign.CargoAPI;
+import com.fs.starfarer.api.campaign.CargoStackAPI;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
+import com.fs.starfarer.api.campaign.SpecialItemData;
+import com.fs.starfarer.api.campaign.SpecialItemSpecAPI;
+import com.fs.starfarer.api.impl.campaign.ids.Commodities;
 
 public class Utility {
+	
+	
+	
+	
+	/**
+	 * Do the actual automatic salvage pickup.
+	 * 
+	 * @param salvage The salvaged (from the debris field).
+	 * @param fleet The recipient fleet.
+	 */
+	public static void resolveSalvage(CargoAPI salvage, CampaignFleetAPI fleet) {
+		CargoAPI recipient = fleet.getCargo();
+		
+		// TODO Do the actual cargo filtering and operations here.
+		
+		float suppliesUnitSize = Global.getSettings().getCommoditySpec(Commodities.SUPPLIES).getCargoSpace();
+		
+		if (salvage.getSupplies() > 0 && recipient.getSpaceLeft() >= suppliesUnitSize) {
+		
+			float toSalvage = recipient.getSpaceLeft() / suppliesUnitSize;
+			
+			if (salvage.getSupplies() < toSalvage) {
+				toSalvage = salvage.getSupplies();
+			}
+			
+			Utility.postConsoleMessage("Salvaged " + toSalvage + " supplies.");
+			salvage.removeSupplies(toSalvage);
+			recipient.addSupplies(toSalvage);
+		}
+		
+		// TODO Make special item check here maybe?
+		
+		salvage.removeEmptyStacks();
+	}
+	
 	/**
 	 * Display a message on the console.
 	 * 
@@ -95,6 +137,35 @@ public class Utility {
 		
 		if (entity.getScripts().size() > 0) {
 			debugMsg += "\n\tframe scripts: " + entity.getScripts().toString();
+		}
+		
+		return debugMsg;
+	}
+	
+	/**
+	 * Debug helper for cargo stacks.
+	 * 
+	 * @param cargo
+	 * @return
+	 */
+	public static String debugCargo(CargoAPI cargo) {
+		String debugMsg = new String();
+		
+		for (CargoStackAPI stack : cargo.getStacksCopy()) {
+			debugMsg += "\n\t[" + stack.getSize() + "] " + stack.getDisplayName();
+			if (stack.isSpecialStack()) {
+				SpecialItemData data = stack.getSpecialDataIfSpecial();
+				SpecialItemSpecAPI spec = stack.getSpecialItemSpecIfSpecial();
+
+				debugMsg += "\n\t\tspecial stack data: " + stack.getData().toString();
+				
+				debugMsg += "\n\t\tspecial stack data id: " + data.getId();
+				debugMsg += "\n\t\tspecial stack data data: " + data.getData();
+				
+				debugMsg += "\n\t\tspecial stack spec id: " + spec.getId();
+				debugMsg += "\n\t\tspecial stack spec name: " + spec.getName();
+				debugMsg += "\n\t\tspecial stack spec params: " + spec.getParams();
+			}
 		}
 		
 		return debugMsg;
