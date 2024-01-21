@@ -1,56 +1,18 @@
 package org.userfriendly.autoscavenge;
 
 import java.awt.Color;
-import java.util.List;
 
 import org.userfriendly.autoscavenge.script.ConsoleMessageFrameScript;
 
 import com.fs.starfarer.api.EveryFrameScript;
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.campaign.CampaignFleetAPI;
 import com.fs.starfarer.api.campaign.CargoAPI;
 import com.fs.starfarer.api.campaign.CargoStackAPI;
 import com.fs.starfarer.api.campaign.SectorEntityToken;
 import com.fs.starfarer.api.campaign.SpecialItemData;
 import com.fs.starfarer.api.campaign.SpecialItemSpecAPI;
-import com.fs.starfarer.api.impl.campaign.ids.Commodities;
 
 public class Utility {
-	
-	
-	
-	
-	/**
-	 * Do the actual automatic salvage pickup.
-	 * 
-	 * @param salvage The salvaged (from the debris field).
-	 * @param fleet The recipient fleet.
-	 */
-	public static void resolveSalvage(CargoAPI salvage, CampaignFleetAPI fleet) {
-		CargoAPI recipient = fleet.getCargo();
-		
-		// TODO Do the actual cargo filtering and operations here.
-		
-		float suppliesUnitSize = Global.getSettings().getCommoditySpec(Commodities.SUPPLIES).getCargoSpace();
-		
-		if (salvage.getSupplies() > 0 && recipient.getSpaceLeft() >= suppliesUnitSize) {
-		
-			float toSalvage = recipient.getSpaceLeft() / suppliesUnitSize;
-			
-			if (salvage.getSupplies() < toSalvage) {
-				toSalvage = salvage.getSupplies();
-			}
-			
-			Utility.postConsoleMessage("Salvaged " + toSalvage + " supplies.");
-			salvage.removeSupplies(toSalvage);
-			recipient.addSupplies(toSalvage);
-		}
-		
-		// TODO Make special item check here maybe?
-		
-		salvage.removeEmptyStacks();
-	}
-	
 	/**
 	 * Display a message on the console.
 	 * 

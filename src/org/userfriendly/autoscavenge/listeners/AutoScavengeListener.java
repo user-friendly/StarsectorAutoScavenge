@@ -1,6 +1,7 @@
 package org.userfriendly.autoscavenge.listeners;
 
 import org.apache.log4j.Logger;
+import org.userfriendly.autoscavenge.Filter;
 import org.userfriendly.autoscavenge.Utility;
 
 import com.fs.starfarer.api.Global;
@@ -128,7 +129,9 @@ public class AutoScavengeListener implements
 				// TODO Search in the rules.csv file - it's some kind of ruins salvage thing.
 				if (!memory.contains("$doNotDismissDialogAfterSalvage")) {
 					log.debug("Automatic salvage pickup is going to do its thing...");
-					Utility.resolveSalvage(loot, Global.getSector().getPlayerFleet());
+					
+					Filter lootFilter = new Filter();
+					lootFilter.apply(loot, Global.getSector().getPlayerFleet());
 					
 					// Given there is unused loot is not empty, remember it
 					// so that the cargo screen opened handler can report it.
